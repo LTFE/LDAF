@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+message bookEvent {
+    bytes txHash = 1;
+    fixed32 blockNumber = 2;
+    fixed32 startTime = 3; //in the SC it's 256b, but it's UNIX time
+    uint32 chargingTime = 4;
+    bytes NFC = 5;
+    uint32 plugId = 6;
+}
+
+message checkTransactionReq {
+    bytes txHash = 1;
+    fixed32 blockNumber = 2;
+}
+
+message checkTransactionRes {
+    bool exists = 1;
+}
+
+message newBlock {
+    fixed32 blockNumber = 1;
+}

@@ -1,0 +1,31 @@
+{
+  "name": "LDAF",
+  "version": "1.0.0",
+  "description": "Low-bandwidth Distributed Application Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.ltfe.org/dejandolenc/lbe.git"
+  },
+  "keywords": [
+    "low-bandwidth",
+    "ws",
+    "server",
+    "ethereum",
+    "binary"
+  ],
+  "author": "Dejan Dolenc",
+  "license": "ISC",
+  "dependencies": {
+    "cron": "^1.3.0",
+    "dotenv": "^4.0.0",
+    "js-binary": "^1.2.0",
+    "protobufjs": "^6.8.6",
+    "web3": "^1.0.0-beta.30",
+    "ws": "^5.0.0",
+    "xml2js": "^0.4.19"
+  }
+}
