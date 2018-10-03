@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message getHash {
+    bytes data = 1;
+    string algorithm = 2;
+}
+
+message returnHash {
+    bytes hash = 1;
+}
