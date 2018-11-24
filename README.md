@@ -50,10 +50,10 @@ This is where LBE comes in. Using this software, all you have to do to make this
 
 1. Download the git repository
 2. Install dependencies with `npm i`
-3. Define the [environment variables](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#environment-variables) (preferably in the [.env file](https://www.npmjs.com/package/dotenv))
+3. Define the [environment variables](https://github.com/LTFE/LDAF/blob/master/README.md#environment-variables) (preferably in the [.env file](https://www.npmjs.com/package/dotenv))
 4. Run using `node index.js`
 
-LDAF on is good out of the box if you just want to see how it works and how to use it, but you really should should create a [service](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#services) if you want to use it properly.
+LDAF on is good out of the box if you just want to see how it works and how to use it, but you really should should create a [service](https://github.com/LTFE/LDAF/blob/master/README.md#services) if you want to use it properly.
 
 ### Environment variables
 
@@ -65,7 +65,7 @@ Environment variables control a number of things throughout LDAF. The intended w
 
 The WebSocket server is enabled by default, and is very useful for testing and monitoring, but it can be disabled
 
-Note that some [Extensions](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#extensions) may use other environment variables. Check their documentation for more.
+Note that some [Extensions](https://github.com/LTFE/LDAF/blob/master/README.md#extensions) may use other environment variables. Check their documentation for more.
 
 ## Services
 
@@ -83,10 +83,10 @@ This object includes:
 *  `clg` - function - console.log that also prints the name of the service
 *  `cle` - function - console.error that also prints the name of the service
 *  `serviceName` - String - the name of the service
-*  `connections` - Array of [connection objects](https://git.ltfe.org/dejandolenc/lbe#connections) - the connections currently assigned to this service
+*  `connections` - Array of [connection objects](https://github.com/LTFE/LDAF#connections) - the connections currently assigned to this service
 
 
-*  `newConnection` - function(connection) - The parameter is an object with 2 properties. The first, `conn`, is the [connection object](https://git.ltfe.org/dejandolenc/lbe#connections), and the second, `offset`, is the type offset that the service should use (the sum of the number of types services before it use). This is the function that will be called to assign a new device to this service.
+*  `newConnection` - function(connection) - The parameter is an object with 2 properties. The first, `conn`, is the [connection object](https://github.com/LTFE/LDAF#connections), and the second, `offset`, is the type offset that the service should use (the sum of the number of types services before it use). This is the function that will be called to assign a new device to this service.
 *  `init` - function - This is the function where you connect to any APIs you want to use; listen for events that devices should (eventually) be notified about.
 *  `stopSubs` - function - called when the current subscriptions should be cancelled - the last device disconnects, the connection to Geth is lost
 *  `sendToAllConnections` - function(messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to all connections that are currently using this service
@@ -98,7 +98,7 @@ For example services check the examples and services folders in the main directo
 
 ### Multiple Services
 
-When a device connects to LDAF, it must supply an array of services that it will use. The device, along with the required type offset, is then added to each service. This way devices can mix and match services as much as they want to as long as the total number of types does not exceed 256^[typeLen](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#encoding). For most cases typeLen=1 should be plenty, but you can use a higher typeLen at the expense of higher overhead. Just make sure that the device and the [Connection](https://git.ltfe.org/dejandolenc/lbe#connections) are configured the same.
+When a device connects to LDAF, it must supply an array of services that it will use. The device, along with the required type offset, is then added to each service. This way devices can mix and match services as much as they want to as long as the total number of types does not exceed 256^[typeLen](https://github.com/LTFE/LDAF/blob/master/README.md#encoding). For most cases typeLen=1 should be plenty, but you can use a higher typeLen at the expense of higher overhead. Just make sure that the device and the [Connection](https://github.com/LTFE/LDAF#connections) are configured the same.
 
 ## Service definition
 
@@ -184,7 +184,7 @@ module.exports = exportObj
 
 The `schema` objects are never used directly. They are there only so the for loop can correctly assign the encode and decode functions. Also keep in mind that this is just my implementation of a serviceDef and yours can be different.
 
-It is important to keep track of the number of messageTypes you're using. All the services a device is using can have a maximum of 256^[typeLen](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#encoding) types. However, this is bound to the device, not the server. A server could have thousands of messageTypes spread across its services, but devices may still work with a typeLen of 1.
+It is important to keep track of the number of messageTypes you're using. All the services a device is using can have a maximum of 256^[typeLen](https://github.com/LTFE/LDAF/blob/master/README.md#encoding) types. However, this is bound to the device, not the server. A server could have thousands of messageTypes spread across its services, but devices may still work with a typeLen of 1.
 
 
 ## Connections
@@ -225,7 +225,7 @@ The server can never receive a request encoded like this and can therefore assum
 
 ### Service level encoding
 
-The encoding for this level is provided by the encode and decode functions defined in the [Service definition](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#service-definition). These can be all kinds of libraries, custom functions, or even JSON.parse/stringify if wrapped correctly. The important thing is that they transcode data between a Buffer and a regular JS Object.
+The encoding for this level is provided by the encode and decode functions defined in the [Service definition](https://github.com/LTFE/LDAF/blob/master/README.md#service-definition). These can be all kinds of libraries, custom functions, or even JSON.parse/stringify if wrapped correctly. The important thing is that they transcode data between a Buffer and a regular JS Object.
 You can use different encodings for each service and even each specific messageType.
 
 Here are my recommendations for this layer:
@@ -242,7 +242,7 @@ The downsides are that the encoded data tends to be slightly larger and it's not
 
 ## Extensions
 
-The Service.js file exports a function that returns a custom [Service](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#services) object for you to extend. This object comes pre-loaded with extensions that you'll need.
+The Service.js file exports a function that returns a custom [Service](https://github.com/LTFE/LDAF/blob/master/README.md#services) object for you to extend. This object comes pre-loaded with extensions that you'll need.
 
 These extensions work with the Service's embedded event emitter that runs the extension's functions at the same time as it runs the Service's functions. In practice this means that whenever the init() function on a service is called, any listener to the 'init' event will also run.
 
@@ -295,7 +295,7 @@ To use LbeClient.js you must import and instantiate it like so: `const lbe = new
 The options object has the following properties:
 
 * address - URL - the address of the LDAF server (REQUIRED)
-* serviceDefs - array of [Service definition](https://git.ltfe.org/dejandolenc/lbe/blob/master/README.md#service-definition) - the definitions of services used by this device (REQUIRED)
+* serviceDefs - array of [Service definition](https://github.com/LTFE/LDAF/blob/master/README.md#service-definition) - the definitions of services used by this device (REQUIRED)
 * typeLen - {1, 2, 4} - the number of bytes to use for the type (Default: 1)
 * seqLen - {1, 2, 4} - the number of bytes to use for the sequence number (Default: 1)
 
