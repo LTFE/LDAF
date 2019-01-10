@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message diff {
+    string newFileUrl = 1;
+    bytes hash = 2;
+}
+
+message response {
+    bytes res = 1;
+}
