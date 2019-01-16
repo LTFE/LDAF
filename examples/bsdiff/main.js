@@ -4,19 +4,6 @@ const bsdiff = require('bsdiff-nodejs');
 
 const fs = require('fs-extra');
 
-const safeRemoveFiles = (files) => {
-    files.forEach(file => {
-        fs.unlink(file, (err) => {
-            if(err){
-                if(err.code === 'ENOENT') {
-                    console.log(file, "not found")
-                }
-                this.cle(err);
-            }
-        })
-    })
-};
-
 class BsDiff extends Service([]) {
     constructor(){
         super('bsdiff');
@@ -54,10 +41,18 @@ class BsDiff extends Service([]) {
                     let response = fs.readFileSync(patchFile);
                     if(response.length < 10) return;
                     sendResponse("diff", {res: response});
-                    safeRemoveFiles([
+                    [
                         newFile,
                         patchFile
-                    ])
+                    ].forEach(file => {
+                        fs.unlink(file, (err) => {
+                            if(err){
+                                if(err.code === 'ENOENT') {
+                                    console.log(file, "not found")
+                                }
+                                this.cle(err);
+                            }
+                        })
 
                 });
             });
