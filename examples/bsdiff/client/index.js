@@ -7,6 +7,11 @@ const ldaf = new (require('./Client'))({
 });
 ldaf.on('connected', () => {
     let url = process.argv[2];
+
+    if(!url) {
+        console.error("no URL specified");
+        return;
+    }
     console.log("using url:", url);
 
     ldaf.callServerFn('diff', {
