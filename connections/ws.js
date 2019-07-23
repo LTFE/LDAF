@@ -29,6 +29,7 @@ wss.on('connection', function newConnection(ws, req) {
         ws.send('missing services header. disconnecting');
         clg('missing services header. disconnecting');
         ws.close();
+        return;
     }
 
     let services = req.headers.services.split(',');
