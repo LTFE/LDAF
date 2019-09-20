@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message bookEvent {
+    fixed32 startTime = 1; //in the SC it's 256b, but it's UNIX time
+    uint32 chargingTime = 2;
+    uint32 plugId = 4;
+}
+
+message newBlock {
+    fixed32 blockNumber = 1;
+}

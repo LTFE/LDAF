@@ -1,11 +1,13 @@
 "use strict";
-const ldaf = new (require('../Client'))({
+import Client from "../Client";
+import swether31 from "./serviceDefs/swether31";
+import genericWeb3 from "./serviceDefs/genericWeb3";
+
+const ldaf = new (Client)({
     address: 'ws://localhost:8547',
     serviceDefs: [
-        require('./serviceDefs/genericWeb3'),
-        require('./serviceDefs/swether31'),
-
-        // require('./schemas/basicMessageHandling')
+        swether31,
+        genericWeb3,
     ]
 });
 

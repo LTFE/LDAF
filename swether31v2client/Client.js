@@ -29,9 +29,7 @@ module.exports = class Client extends require('events'){
 
         let encodedServices = this.services.map(s => `s=${s}`);
 
-        console.log(opts.address + encodedServices.join("&"));
-
-        this.ws = new WebSocket(opts.address + "/" + encodedServices.join("&"), [],{});
+        this.ws = new WebSocket(opts.address + encodedServices.join("&"), [],{});
 
         this.ws.on("error", console.error);
 
