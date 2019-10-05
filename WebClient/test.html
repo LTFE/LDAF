@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="protobuf.js"></script>
+    <script src="eventemitter3.js"></script>
+    <script type="module">
+        import serviceDef from "./serviceDef.js";
+        import Client from "./WebClient.js";
+
+        const hexStringToUint8 = hexString => new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+        const ldaf = new (Client)({
+            address: 'ws://localhost:8547',
+            serviceDefs: [
+                serviceDef
+            ]
+        });
+
+        ldaf.on('bookEvent', function (payload) {
+            console.log('got book event', payload)
+        });
+
+        ldaf.on('newBlock', function (payload) {
+            console.log('got new block', payload)
+        });
+
+        ldaf.on('connected', function test() {
+            ldaf.callServerFn( 'checkTransaction', {
+                txHash: hexStringToUint8('034a6a15b42c51f34b1c4ff9d7448912216e28c425f41e6f7e4f56b458626527'),
+                blockNumber: 2434097
+            }, (res) => {
+                console.log('verify transaction (swether 3.1)', res);
+            });
+            //the following should fail
+            ldaf.callServerFn( 'checkTransaction', {
+                txHash: hexStringToUint8('034a6a15b42c51f34b1c4ff9d7448912216e28c425f41e6f7e4f56b458626527'),
+                blockNumber: 2434098
+            }, (res) => {
+                console.log('verify transaction (swether 3.1) - should fail', res);
+            });
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

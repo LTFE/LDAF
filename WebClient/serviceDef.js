@@ -1,5 +1,7 @@
 "use strict";
-const root = (require("protobufjs")).parse(
+
+// import * as test from "./protobuf.js";
+const {root} = protobuf.parse( //imported in HTML script tag
     'syntax = "proto3";' +
     'message bookEvent {' +
     '    bytes txHash = 1;' +
@@ -19,7 +21,7 @@ const root = (require("protobufjs")).parse(
     'message newBlock {' +
     '    fixed32 blockNumber = 1;' +
     '}'
-).root;
+);
 const exportObj = {
     name: 'swether31',
     messageTypes:
@@ -52,4 +54,4 @@ for(let messageType of exportObj.messageTypes){
     messageType.decode = (buf) => messageType.schema.decode(buf);
 }
 
-module.exports = exportObj;
+export default exportObj;

@@ -1,4 +1,7 @@
-require('dotenv').load();
+let result = require('dotenv').config();
+if(result.error && result.error.code !== "ENOENT"){
+    console.error(result.error);
+}
 module.exports = {
     eventEmitter: new(require('events'))
 };

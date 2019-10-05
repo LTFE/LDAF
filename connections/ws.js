@@ -1,7 +1,9 @@
 'use strict';
 const WebSocket = require('ws');
+const querystring = require("querystring");
 const fs = require('fs');
 const path = require('path');
+const http = require("http");
 const transcoder = new (require('./ServerTranscoder'))({
     typeLen: 1,
     seqLen: 1
@@ -9,13 +11,16 @@ const transcoder = new (require('./ServerTranscoder'))({
 const clg = console.log.bind(null, 'ws');
 const cle = console.error.bind(null, 'ws');
 
+const httpServer = http.createServer();
+httpServer.listen(process.env.WS_PORT || 8547)
+
 const wss = new WebSocket.Server({
-    port: process.env.WS_PORT || 8547
+    server: httpServer
 });
 
 
 wss.on('listening', function () {
-    clg('server listening');
+    clg('server listening', wss.address());
 });
 
 
@@ -25,13 +30,26 @@ wss.on('error', function (a,b,c,d) {
 
 
 wss.on('connection', function newConnection(ws, req) {
-    if(!req.headers.hasOwnProperty('services')) {
-        ws.send('missing services header. disconnecting');
-        clg('missing services header. disconnecting');
+
+    // ws.send(Buffer.from('000102030405', 'hex'));
+
+    let params = querystring.parse(req.url.substr(1));
+
+    if(!params.s) {
+        ws.send('missing services info. disconnecting');
+        clg('missing services info. disconnecting');
         ws.close();
+        return;
     }
 
-    let services = req.headers.services.split(',');
+    let services;
+
+    if(Array.isArray(params.s)){
+        services = params.s;
+    }
+    else {
+        services = [params.s];
+    }
 
     let conn = new Connection(ws, req, services);
     clg('new connection. services:', services);
@@ -75,15 +93,21 @@ class Connection extends require('events'){
         this.req = req;
 
         ws.on('message', (rawMessage) => {
+
+            if(!rawMessage){
+                console.log("got empty rawMessage");
+                return;
+            }
+
             let message;
             try {
                 message = transcoder.decode(rawMessage)
             }
             catch (e){
-                this.emit('error', e);
+                // this.emit('error', e);
                 clg('couldnt decode raw message', rawMessage);
             }
-            this.emit('message', message);
+            if(message) this.emit('message', message);
         });
 
         ws.on('end', () => {
@@ -102,6 +126,9 @@ class Connection extends require('events'){
     }
 
     send(type, seq, encodedMessage){
+        if(this.ws.readyState !== this.ws.OPEN) {
+            console.log("message not sent because websocket is not open");
+        }
         this.ws.send(transcoder.encode(
             type,
             seq,

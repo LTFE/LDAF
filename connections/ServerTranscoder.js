@@ -64,6 +64,11 @@ module.exports = class ServerTranscoder {
     }
 
     decode(messageBuffer){
+        if(!Buffer.isBuffer(messageBuffer)){
+            console.error(messageBuffer);
+            throw "got invalid messageBuffer type in decoder. Probably because the client sent a string instead of binary data";
+        }
+
         try {
             return {
                 type: this.readInt(messageBuffer.slice(0, this.opts.typeLen)),

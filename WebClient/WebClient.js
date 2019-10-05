@@ -1,6 +1,7 @@
 "use strict";
-const WebSocket = require('ws');
-module.exports = class Client extends require('events'){
+// import events from "./events.js";
+
+export default class Client extends EventEmitter{
 
     constructor(opts){
         /*
@@ -31,18 +32,20 @@ module.exports = class Client extends require('events'){
 
         console.log(opts.address + encodedServices.join("&"));
 
-        this.ws = new WebSocket(opts.address + "/" + encodedServices.join("&"), [],{});
+        this.ws = new WebSocket(opts.address + "/" + encodedServices.join("&"));
+        this.ws.binaryType = 'arraybuffer';
 
-        this.ws.on("error", console.error);
+        this.ws.addEventListener("error", console.error);
 
-        this.ws.on("closed", () => {
+        this.ws.addEventListener("closed", () => {
             console.log("ws closed")
         });
 
-        this.ws.on('open', () => {
+        this.ws.addEventListener('open', () => {
             this.emit('connected');//TODO: separate client and message event emitters
-            this.ws.on('message', (encodedMessage) => {
-                let message = this.transcoder.decode(encodedMessage);
+            this.ws.addEventListener('message', (encodedMessage) => {
+                let ab = encodedMessage.data;
+                let message = this.transcoder.decode(ab);
 
                 let messageType;
                 try {
@@ -91,9 +94,7 @@ module.exports = class Client extends require('events'){
             seq: currentSeq,
             cb
         };
-        let a = messageType.encode(obj);
-        let b = this.transcoder.encode(messageType.number, currentSeq, a);
-        this.ws.send(this.transcoder.encode(messageType.number, currentSeq, a));
+        this.ws.send(this.transcoder.encode(messageType.number, currentSeq, messageType.encode(obj)));
 
     }
 
@@ -130,7 +131,7 @@ module.exports = class Client extends require('events'){
         if(this.seq >= this.maxSeq) this.seq = 1;
         return this.seq;
     }
-};
+}
 
 class ClientTranscoder {
     constructor(_opts) {
@@ -145,48 +146,55 @@ class ClientTranscoder {
 
 
     encodeInt(num, length) {
+        if(![1,2,4].includes(length)){
+            throw new Error('invalid UInt length ' + length);
+        }
+
         if (typeof num !== 'number' || num < 0 || num >= (256 ^ length)) {
             throw new Error(`can't encode ${num} into ${length} bytes`);
         }
-        let out = Buffer.alloc(length);
+        let out = new ArrayBuffer(length);
+        let dv = new DataView(out);
         switch (length) {
             case 1:
-                out.writeUInt8(num);
+                dv.setUint8(0,num);
                 break;
             case 2:
-                out.writeUInt16BE(num);
+                dv.setUint16(0,num);
                 break;
             case 4:
-                out.writeUInt32BE(num);
+                dv.setUint32(0,num);
                 break;
-            default:
-                throw new Error('invalid UInt length ' + length);
+
         }
-        return out
+        return dv.buffer;
     }
 
 
-    readInt(buf) {
-        switch (buf.length) {
+    readInt(ab) {
+        let dv = new DataView(ab);
+        switch (ab.byteLength) {
             case 1:
-                return buf.readUInt8();
+                return dv.getUint8();
             case 2:
-                return buf.readUInt16BE();
+                return dv.getUint16();
             case 4:
-                return buf.readUInt32BE();
+                return dv.getUint32();
             default:
-                throw new Error('invalid UInt length ' + buf.length);
+                throw new Error('invalid UInt length ' + ab.byteLength);
         }
     }
 
 
     encode(type, seq, encodedMessage) {
         try {
-            return Buffer.concat([
-                this.encodeInt(type, this.opts.typeLen),
-                this.encodeInt(seq, this.opts.seqLen),
-                encodedMessage
-            ]);
+            let out = new Uint8Array(this.opts.typeLen + this.opts.seqLen + encodedMessage.length);
+
+            out.set(new Uint8Array(this.encodeInt(type, this.opts.typeLen)));
+            out.set(new Uint8Array(this.encodeInt(seq, this.opts.seqLen)), this.opts.typeLen);
+            out.set(encodedMessage, this.opts.typeLen + this.opts.seqLen);
+
+            return out;
         }
         catch (e) {
             console.error('error in encoding', arguments, e);
@@ -194,20 +202,15 @@ class ClientTranscoder {
     }
 
 
-    decode(messageBuffer) {
+    decode(ab) {
         try {
-            let type = this.readInt(messageBuffer.slice(0, this.opts.typeLen));
-            if (this.opts.eventTypes.includes(type)) {
-                return {
-                    type,
-                    seq: 0,
-                    payload: messageBuffer.slice(this.opts.typeLen)
-                }
-            }
+            let type = this.readInt(ab.slice(0, this.opts.typeLen));
+            let seq = this.opts.eventTypes.includes(type) ? 0 : this.readInt(ab.slice(this.opts.typeLen, this.opts.typeLen + this.opts.seqLen));
+
             return {
-                type: this.readInt(messageBuffer.slice(0, this.opts.typeLen)),
-                seq: this.readInt(messageBuffer.slice(this.opts.typeLen, this.opts.typeLen + this.opts.seqLen)),
-                payload: messageBuffer.slice(this.opts.typeLen + this.opts.seqLen)
+                type,
+                seq,
+                payload: new Uint8Array(ab.slice(this.opts.typeLen + (seq === 0 ? 0 : this.opts.seqLen)))
             }
         }
         catch (e) {
