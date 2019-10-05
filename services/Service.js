@@ -44,7 +44,7 @@ class Service extends require('events'){
         //TODO: use the name of the object instead of passing in a parameter
         this.ee = require.main.exports.eventEmitter;
         this.serviceName = serviceName || this.constructor.name;
-        this.clg = console.log.bind(null, (process.env.DEBUG_TIME === "true" ? new Date() : "") +this.serviceName);
+        this.clg = console.log.bind(null, this.serviceName);
         this.cle = console.error.bind(null, this.serviceName);
         this.connections = [];
 
