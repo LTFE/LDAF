@@ -111,7 +111,8 @@ class Service extends require('events'){
             this.emit(
                 this.messageTypeArray[message.type].name,
                 message.payload,
-                this.sendToConnection.bind(this, connection, message.seq)
+                this.sendToConnection.bind(this, connection, message.seq),
+                connection
             );
         });
 
