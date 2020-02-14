@@ -87,10 +87,10 @@ This object includes:
 
 
 *  `newConnection` - function(connection) - The parameter is an object with 2 properties. The first, `conn`, is the [connection object](https://github.com/LTFE/LDAF#connections), and the second, `offset`, is the type offset that the service should use (the sum of the number of types services before it use). This is the function that will be called to assign a new device to this service.
-*  `init` - function - This is the function where you connect to any APIs you want to use; listen for events that devices should (eventually) be notified about.
+*  `init` - function - This runs when the service starts. Use this function to any APIs you want to use; listen for events that devices should (eventually) be notified about. 
 *  `stopSubs` - function - called when the current subscriptions should be cancelled - the last device disconnects, the connection to Geth is lost
-*  `sendToAllConnections` - function(messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to all connections that are currently using this service
-*  `sendToConnection` - function(connection, messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to the connection
+*  `sendToAllConnections` - function(messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to all connections that are currently using this service. This is used with for push messages.
+*  `sendToConnection` - function(connection, messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to the connection. This is used with for push messages.
 
 When a message arrives at the service, it gets decoded and is emitted as an event with the name of the 
 
