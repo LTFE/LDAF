@@ -150,8 +150,8 @@ class Service extends require('events'){
         }
     }
     
-    sendToConnection(connection, seq, type, messageObj){
-        let messageType = this.getMessageType(type, seq);
+    sendToConnection(connection, type, messageObj){
+        let messageType = this.getMessageType(type, 0);
         let encodedMessage;
         try {
             encodedMessage = messageType.encode(messageObj);
