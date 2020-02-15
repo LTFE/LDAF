@@ -90,7 +90,7 @@ This object includes:
 *  `init` - function - This runs when the service starts. Use this function to any APIs you want to use; listen for events that devices should (eventually) be notified about. 
 *  `stopSubs` - function - called when the current subscriptions should be cancelled - the last device disconnects, the connection to Geth is lost
 *  `sendToAllConnections` - function(messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to all connections that are currently using this service. This is used with for push messages.
-*  `sendToConnection` - function(connection, messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to the connection. This is used with for push messages.
+*  `sendToConnection` - function(connection, seq, messageType, messageObj) - encodes messageObj into a message of the specified type and sends it to the connection. This is used with for push messages. Set `seq` to 0 for a push message.
 
 When a message arrives at the service, it gets decoded and is emitted as an event with the name of the 
 
