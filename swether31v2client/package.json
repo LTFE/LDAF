@@ -9,7 +9,7 @@
   "author": "Dejan Dolenc",
   "license": "ISC",
   "dependencies": {
-    "protobufjs": "^6.8.8",
+    "protobufjs": "^6.11.3",
     "ws": "^6.1.2"
   }
 }
